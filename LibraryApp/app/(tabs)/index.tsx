@@ -37,7 +37,7 @@ export default function HomeScreen() {
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 2: Explore</ThemedText>
         <ThemedText>
-          Tap the Exaaaaplore tab to learn more about what's included in this starter app.
+          Tap the Exaaaaploressss tab to learn more about what's included in this starter app.
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
