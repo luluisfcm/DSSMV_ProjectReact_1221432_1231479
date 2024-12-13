@@ -1,6 +1,9 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "typeRoots": ["node_modules/@types"],
     "strict": true,
     "paths": {
       "@/*": [
@@ -9,6 +12,7 @@
     }
   },
   "include": [
+    "src/**/*", "node_modules",
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
