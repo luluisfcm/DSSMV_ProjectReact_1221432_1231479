@@ -1,8 +1,8 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import MainMenu from './index';
-import LibrariesScreen from './LibrariesScreen';
-import UsersScreen from './UserScreen';
+import MainMenu from '../index';
+import LibrariesScreen from '../screens/LibrariesScreen';
+import UsersScreen from '../screens/UserScreen';
 
 // Define the route params for type safety
 export type RootStackParamList = {
