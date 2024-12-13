@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { RootStackParamList } from './Navigator'; // Import the type from your Navigator
+import { RootStackParamList } from './navigation/Navigator'; // Import the type from your Navigator
 
 export default function MainMenu() {
     // Properly type the navigation object
