@@ -161,7 +161,7 @@ const LibrariesScreen: React.FC = () => {
     const renderCard = ({ item }: { item: Library }) => (
         <TouchableOpacity
             style={styles.card}
-            onPress={() => {
+            onLongPress={() => {
                 Alert.alert(
                     "Ações",
                     `Escolha uma ação para "${item.name}"`,
