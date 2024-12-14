@@ -1,27 +1,20 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import MainMenu from '../screens/UserScreen'; // Corrija o caminho se necessário
 import LibrariesScreen from '../screens/LibrariesScreen';
-import UsersScreen from '../screens/UserScreen';
+import UsersScreen from "@/app/screens/UserScreen";
+import MainMenu from "@/app/screens/MainMenu";
 
-// Definição do tipo para as rotas
-export type RootStackParamList = {
-    TabTwoScreen: undefined;
-    LibrariesScreen: undefined;
-    UsersScreen: undefined;
-};
+const Stack = createStackNavigator();
 
-const Stack = createStackNavigator<RootStackParamList>();
-
-export default function App() {
-    return (
-        <NavigationContainer>
-            <Stack.Navigator initialRouteName="TabTwoScreen">
-                <Stack.Screen name="TabTwoScreen" component={MainMenu} options={{ title: 'Main Menu' }} />
+const Navigation: React.FC = () => (
+    <NavigationContainer>
+        <Stack.Navigator>
+            <Stack.Screen name="Libraries" component={LibrariesScreen} />
                 <Stack.Screen name="LibrariesScreen" component={LibrariesScreen} options={{ title: 'Libraries' }} />
                 <Stack.Screen name="UsersScreen" component={UsersScreen} options={{ title: 'Users' }} />
-            </Stack.Navigator>
-        </NavigationContainer>
-    );
-}
+                <Stack.Screen name="MainMenu" component={MainMenu} options={{ title: 'Menu' }} />
+        </Stack.Navigator>
+    </NavigationContainer>
+);
+export default Navigation;
