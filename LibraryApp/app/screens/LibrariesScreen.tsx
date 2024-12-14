@@ -12,23 +12,22 @@ import {
     Button
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Accelerometer } from 'expo-sensors'; // Usando a API de sensores do Expo
 
 // Interface para os dados da biblioteca
 interface Library {
-    id: string;       // ID único
-    name: string;     // Nome da biblioteca
-    address: string;  // Endereço
-    openTime: string; // Horário de abertura
-    closeTime: string; // Horário de fechamento
-    openDays: string; // Dias de funcionamento
+    id: string;
+    name: string;
+    address: string;
+    openTime: string;
+    closeTime: string;
+    openDays: string;
 }
 
 const LibrariesScreen: React.FC = () => {
     const [data, setData] = useState<Library[] | null>(null);
     const [loading, setLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
-    const [editModalVisible, setEditModalVisible] = useState(false);
-    const [selectedLibrary, setSelectedLibrary] = useState<Library | null>(null);
     const [newLibrary, setNewLibrary] = useState({
         name: '',
         address: '',
@@ -87,60 +86,26 @@ const LibrariesScreen: React.FC = () => {
         }
     };
 
-    // Função para atualizar uma biblioteca
-    const updateLibrary = async () => {
-        if (!selectedLibrary) return;
-
-        try {
-            const response = await fetch(`http://193.136.62.24/v1/library/${selectedLibrary.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(selectedLibrary)
-            });
-
-            if (response.ok) {
-                Alert.alert('Sucesso', 'Biblioteca atualizada com sucesso!');
-                setEditModalVisible(false);
-                fetchLibraries();
-            } else {
-                const errorData = await response.json();
-                Alert.alert('Erro', errorData.message || 'Erro ao atualizar biblioteca.');
-            }
-        } catch (error) {
-            console.error(error);
-            Alert.alert('Erro', 'Erro ao atualizar biblioteca.');
-        }
-    };
-
-    // Função para deletar uma biblioteca
-    const deleteLibrary = async (libraryId: string) => {
-        try {
-            const response = await fetch(`http://193.136.62.24/v1/library/${libraryId}`, {
-                method: 'DELETE',
-            });
-
-            if (response.ok) {
-                Alert.alert('Sucesso', 'Biblioteca removida com sucesso!');
-                fetchLibraries(); // Atualiza a lista após a exclusão
-            } else if (response.status === 500) {
-                Alert.alert(
-                    'Erro',
-                    'A biblioteca não pode ser removida porque contém livros associados.'
-                );
-            } else {
-                const errorData = await response.json();
-                Alert.alert('Erro', errorData.message || 'Erro ao remover biblioteca.');
-            }
-        } catch (error) {
-            console.error(error);
-            Alert.alert('Erro', 'Erro ao remover biblioteca.');
-        }
-    };
-
     useEffect(() => {
         fetchLibraries();
+
+        // Função para detectar o movimento de agitar o telefone
+        const subscription = Accelerometer.addListener(accelerometerData => {
+            const { x, y, z } = accelerometerData;
+
+            // Lógica para detectar o movimento de agitar o telefone (exemplo simples)
+            if (Math.abs(x) > 2 || Math.abs(y) > 2 || Math.abs(z) > 2) {
+                setModalVisible(true); // Abre o modal quando o telefone for agitado
+            }
+        });
+
+        // Começa a ouvir os dados do acelerômetro
+        Accelerometer.setUpdateInterval(100); // Intervalo de atualização do acelerômetro
+
+        // Cleanup
+        return () => {
+            subscription.remove();
+        };
     }, []);
 
     const renderCard = ({ item }: { item: Library }) => (
@@ -154,13 +119,14 @@ const LibrariesScreen: React.FC = () => {
                         {
                             text: "Editar",
                             onPress: () => {
-                                setSelectedLibrary(item);
-                                setEditModalVisible(true);
+                                // Implementar lógica de edição
                             },
                         },
                         {
                             text: "Excluir",
-                            onPress: () => deleteLibrary(item.id), // Passando o ID diretamente
+                            onPress: () => {
+                                // Implementar lógica de exclusão
+                            },
                             style: "destructive",
                         },
                         {
@@ -178,8 +144,6 @@ const LibrariesScreen: React.FC = () => {
             <Text style={styles.details}>Dias: {item.openDays}</Text>
         </TouchableOpacity>
     );
-
-
 
     return (
         <View style={styles.container}>
@@ -201,6 +165,7 @@ const LibrariesScreen: React.FC = () => {
                 />
             )}
 
+            {/* Botão flutuante para abrir o modal manualmente */}
             <TouchableOpacity
                 style={styles.fab}
                 onPress={() => setModalVisible(true)}
@@ -260,59 +225,6 @@ const LibrariesScreen: React.FC = () => {
                     </View>
                 </View>
             </Modal>
-
-            {/* Modal para editar/excluir biblioteca */}
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={editModalVisible}
-                onRequestClose={() => setEditModalVisible(false)}
-            >
-                <View style={styles.modalView}>
-                    <Text style={styles.modalTitle}>Editar Biblioteca</Text>
-
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Nome"
-                        placeholderTextColor="#999"
-                        value={selectedLibrary?.name}
-                        onChangeText={(text) => setSelectedLibrary({ ...selectedLibrary, name: text } as Library)}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Endereço"
-                        placeholderTextColor="#999"
-                        value={selectedLibrary?.address}
-                        onChangeText={(text) => setSelectedLibrary({ ...selectedLibrary, address: text } as Library)}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Horário de Abertura"
-                        placeholderTextColor="#999"
-                        value={selectedLibrary?.openTime}
-                        onChangeText={(text) => setSelectedLibrary({ ...selectedLibrary, openTime: text } as Library)}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Horário de Fechamento"
-                        placeholderTextColor="#999"
-                        value={selectedLibrary?.closeTime}
-                        onChangeText={(text) => setSelectedLibrary({ ...selectedLibrary, closeTime: text } as Library)}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Dias de Funcionamento"
-                        placeholderTextColor="#999"
-                        value={selectedLibrary?.openDays}
-                        onChangeText={(text) => setSelectedLibrary({ ...selectedLibrary, openDays: text } as Library)}
-                    />
-
-                    <View style={styles.buttonRow}>
-                        <Button title="Cancelar" onPress={() => setEditModalVisible(false)} />
-                        <Button title="Atualizar" onPress={updateLibrary} />
-                    </View>
-                </View>
-            </Modal>
         </View>
     );
 };
@@ -343,16 +255,16 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#333', // Cor do título para contraste com o fundo
+        color: '#333',
     },
     address: {
         fontSize: 14,
-        color: '#666', // Cor do endereço ajustada para maior visibilidade
+        color: '#666',
     },
     details: {
-        fontSize: 14, // Tamanho de fonte ajustado
-        color: '#333', // Certificando que o texto é visível em fundo branco
-        marginTop: 4, // Adicionando espaçamento entre os elementos
+        fontSize: 14,
+        color: '#333',
+        marginTop: 4,
     },
     backButton: {
         backgroundColor: '#6200ee',
