@@ -118,12 +118,17 @@ const LibrariesScreen: React.FC = () => {
     const deleteLibrary = async (libraryId: string) => {
         try {
             const response = await fetch(`http://193.136.62.24/v1/library/${libraryId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
             });
 
             if (response.ok) {
                 Alert.alert('Sucesso', 'Biblioteca removida com sucesso!');
                 fetchLibraries(); // Atualiza a lista após a exclusão
+            } else if (response.status === 500) {
+                Alert.alert(
+                    'Erro',
+                    'A biblioteca não pode ser removida porque contém livros associados.'
+                );
             } else {
                 const errorData = await response.json();
                 Alert.alert('Erro', errorData.message || 'Erro ao remover biblioteca.');
@@ -134,7 +139,6 @@ const LibrariesScreen: React.FC = () => {
         }
     };
 
-
     useEffect(() => {
         fetchLibraries();
     }, []);
@@ -142,7 +146,7 @@ const LibrariesScreen: React.FC = () => {
     const renderCard = ({ item }: { item: Library }) => (
         <TouchableOpacity
             style={styles.card}
-            onPress={() => {
+            onLongPress={() => {
                 Alert.alert(
                     "Ações",
                     `Escolha uma ação para "${item.name}"`,
@@ -339,15 +343,16 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#333',
+        color: '#333', // Cor do título para contraste com o fundo
     },
     address: {
         fontSize: 14,
-        color: '#666',
+        color: '#666', // Cor do endereço ajustada para maior visibilidade
     },
     details: {
-        fontSize: 12,
-        color: '#888',
+        fontSize: 14, // Tamanho de fonte ajustado
+        color: '#333', // Certificando que o texto é visível em fundo branco
+        marginTop: 4, // Adicionando espaçamento entre os elementos
     },
     backButton: {
         backgroundColor: '#6200ee',
