@@ -12,6 +12,7 @@ import {
     Button
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import {router} from "expo-router";
 
 // Interface para os dados da biblioteca
 interface Library {
