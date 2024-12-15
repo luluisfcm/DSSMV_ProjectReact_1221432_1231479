@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { router } from 'expo-router'; // Importando o hook de navegação
+import { router } from 'expo-router';
+import {useState} from "react"; // Importando o hook de navegação
 
 const UsernameScreen: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -47,10 +48,8 @@ const UsernameScreen: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
         backgroundColor: '#f5f5f5',
+        padding: 20,
     },
     backButton: {
         backgroundColor: '#6200ee',
