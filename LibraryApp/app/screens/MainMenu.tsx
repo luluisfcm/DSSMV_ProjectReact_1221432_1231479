@@ -10,9 +10,10 @@ export default function MainMenu() {
             <TouchableOpacity style={styles.button} onPress={() => router.push('./screens/LibrariesScreen')}>
                 <Text style={styles.buttonText}>View Libraries</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => router.push('./screens/UserScreen')}>
+            <TouchableOpacity style={styles.button} onPress={() => router.push('./screens/UsernameScreen')}>
                 <Text style={styles.buttonText}>View Users</Text>
             </TouchableOpacity>
+
         </View>
     );
 }
