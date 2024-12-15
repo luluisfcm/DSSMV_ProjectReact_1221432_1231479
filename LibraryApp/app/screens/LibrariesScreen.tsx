@@ -202,7 +202,7 @@ const LibrariesScreen: React.FC = () => {
                 style={styles.backButton}
                 onPress={() => navigation.goBack()}
             >
-                <Text style={styles.backButtonText}>Voltar</Text>
+                <Text style={styles.backButtonText}>Back</Text>
             </TouchableOpacity>
 
             {loading ? (

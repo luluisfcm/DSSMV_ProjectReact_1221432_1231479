@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
+import {router} from "expo-router";
 
 // Interface for the author data
 interface Author {
@@ -28,7 +29,6 @@ interface Book {
     isbn: string;      // ISBN of the book (unique identifier)
     title: string;     // Title of the book
     authors: Author[]; // List of authors
-    description: string; // Description of the book
     cover: Cover;      // Cover URLs
     available: number; // 0 = Not available, 1 = Available
 }
@@ -56,7 +56,6 @@ const LibraryBookScreen: React.FC = () => {
                 isbn: item.isbn,
                 title: item.book.title,
                 authors: item.book.authors.map((author: any) => ({ name: author.name })),
-                description: item.book.description,
                 cover: item.book.cover,
                 available: item.available, // Assuming 0 means not available, 1 means available
             }));
@@ -71,16 +70,18 @@ const LibraryBookScreen: React.FC = () => {
     };
 
     const renderBook = ({ item }: { item: Book }) => (
-        <View style={styles.card}>
+        <TouchableOpacity
+            style={styles.card}
+            onPress={() => router.push({ pathname: './BookDetailsScreen', params: { isbn: item.isbn }})}
+        >
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.author}>Author: {item.authors.map(a => a.name).join(', ')}</Text>
-            <Text style={styles.isbn}>ISBN: {item.isbn}</Text>
-            <Text style={styles.description}>{item.description}</Text>
-            <Text style={[styles.status, { color: item.available === 1 ? '#28a745' : '#dc3545' }]}>
-                {item.available === 1 ? 'Available' : 'Not Available'}
+            <Text style={[styles.status, { color: item.available > 0 ? '#28a745' : '#dc3545' }]}>
+                {item.available > 0 ? `${item.available} Available` : 'Not Available'}
             </Text>
-        </View>
+        </TouchableOpacity>
     );
+
 
     return (
         <View style={styles.container}>
@@ -151,16 +152,6 @@ const styles = StyleSheet.create({
     author: {
         fontSize: 14,
         color: '#555',
-        marginTop: 5,
-    },
-    isbn: {
-        fontSize: 12,
-        color: '#777',
-        marginTop: 3,
-    },
-    description: {
-        fontSize: 12,
-        color: '#777',
         marginTop: 5,
     },
     status: {
