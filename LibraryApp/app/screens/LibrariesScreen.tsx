@@ -12,9 +12,7 @@ import {
     Button
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Accelerometer } from 'expo-sensors'; // Usando a API de sensores do Expo
 
-// Interface para os dados da biblioteca
 // Interface para os dados da biblioteca
 interface Library {
     id: string;       // ID único
@@ -40,29 +38,7 @@ const LibrariesScreen: React.FC = () => {
     });
     const navigation = useNavigation();
 
-    useEffect(() => {
-        fetchLibraries();
-
-        // Função para detectar o movimento de agitar o telefone
-        const subscription = Accelerometer.addListener(accelerometerData => {
-            const { x, y, z } = accelerometerData;
-
-            // Lógica para detectar o movimento de agitar o telefone (exemplo simples)
-            if (Math.abs(x) > 2 || Math.abs(y) > 2 || Math.abs(z) > 2) {
-                setModalVisible(true); // Abre o modal quando o telefone for agitado
-            }
-        });
-
-        // Começa a ouvir os dados do acelerômetro
-        Accelerometer.setUpdateInterval(100); // Intervalo de atualização do acelerômetro
-
-        // Cleanup
-        return () => {
-            subscription.remove();
-        };
-    }, []);
-
-    // GET Função para buscar os dados
+    // Função para buscar os dados
     const fetchLibraries = async () => {
         try {
             const response = await fetch('http://193.136.62.24/v1/library');
@@ -76,7 +52,7 @@ const LibrariesScreen: React.FC = () => {
         }
     };
 
-    // POST Função para adicionar uma nova biblioteca
+    // Função para adicionar uma nova biblioteca
     const addLibrary = async () => {
         const { name, address, openTime, closeTime, openDays } = newLibrary;
 
@@ -111,7 +87,7 @@ const LibrariesScreen: React.FC = () => {
         }
     };
 
-    // PUT Função para atualizar uma biblioteca
+    // Função para atualizar uma biblioteca
     const updateLibrary = async () => {
         if (!selectedLibrary) return;
 
@@ -138,16 +114,21 @@ const LibrariesScreen: React.FC = () => {
         }
     };
 
-    // DELETE Função para deletar uma biblioteca
+    // Função para deletar uma biblioteca
     const deleteLibrary = async (libraryId: string) => {
         try {
             const response = await fetch(`http://193.136.62.24/v1/library/${libraryId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
             });
 
             if (response.ok) {
                 Alert.alert('Sucesso', 'Biblioteca removida com sucesso!');
                 fetchLibraries(); // Atualiza a lista após a exclusão
+            } else if (response.status === 500) {
+                Alert.alert(
+                    'Erro',
+                    'A biblioteca não pode ser removida porque contém livros associados.'
+                );
             } else {
                 const errorData = await response.json();
                 Alert.alert('Erro', errorData.message || 'Erro ao remover biblioteca.');
@@ -157,6 +138,10 @@ const LibrariesScreen: React.FC = () => {
             Alert.alert('Erro', 'Erro ao remover biblioteca.');
         }
     };
+
+    useEffect(() => {
+        fetchLibraries();
+    }, []);
 
     const renderCard = ({ item }: { item: Library }) => (
         <TouchableOpacity
@@ -193,6 +178,8 @@ const LibrariesScreen: React.FC = () => {
             <Text style={styles.details}>Dias: {item.openDays}</Text>
         </TouchableOpacity>
     );
+
+
 
     return (
         <View style={styles.container}>
@@ -356,15 +343,16 @@ const styles = StyleSheet.create({
     name: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#333',
+        color: '#333', // Cor do título para contraste com o fundo
     },
     address: {
         fontSize: 14,
-        color: '#666',
+        color: '#666', // Cor do endereço ajustada para maior visibilidade
     },
     details: {
-        fontSize: 12,
-        color: '#888',
+        fontSize: 14, // Tamanho de fonte ajustado
+        color: '#333', // Certificando que o texto é visível em fundo branco
+        marginTop: 4, // Adicionando espaçamento entre os elementos
     },
     backButton: {
         backgroundColor: '#6200ee',
