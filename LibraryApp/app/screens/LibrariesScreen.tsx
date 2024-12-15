@@ -12,7 +12,8 @@ import {
     Button
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Accelerometer } from 'expo-sensors'; // Usando a API de sensores do Expo
+import { Accelerometer } from 'expo-sensors';
+import {router} from "expo-router"; // Usando a API de sensores do Expo
 
 // Interface para os dados da biblioteca
 // Interface para os dados da biblioteca
@@ -161,6 +162,7 @@ const LibrariesScreen: React.FC = () => {
     const renderCard = ({ item }: { item: Library }) => (
         <TouchableOpacity
             style={styles.card}
+            onPress={() => router.push({ pathname: './LibraryBookScreen', params: { id: item.id } })}
             onLongPress={() => {
                 Alert.alert(
                     "Ações",
