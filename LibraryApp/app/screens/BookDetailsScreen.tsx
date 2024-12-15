@@ -2,29 +2,31 @@ import * as React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
-// Component to display book details
 const BookDetailsScreen: React.FC = () => {
-    // Get the ISBN passed from the previous screen
     const route = useRoute();
-    const navigation = useNavigation();  // Access the navigation object
-    const { isbn } = route.params as { isbn: string }; // Destructure ISBN from params
+    const navigation = useNavigation();
+    const { isbn = "Unknown ISBN" } = route.params as { isbn?: string };
 
     return (
         <View style={styles.container}>
             <TouchableOpacity
                 style={styles.backButton}
-                onPress={() => navigation.goBack()}  // Use navigation to go back
+                onPress={() => navigation.goBack()}
             >
                 <Text style={styles.backButtonText}>Back</Text>
             </TouchableOpacity>
             <Text style={styles.title}>Book ISBN</Text>
-            <Text style={styles.isbn}>{isbn}</Text> {/* Display the ISBN */}
+            <Text style={styles.isbn}>{isbn}</Text>
         </View>
     );
 };
 
-// Basic styling
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#f5f5f5',
+        padding: 20,
+    },
     backButton: {
         backgroundColor: '#6200ee',
         paddingVertical: 12,
@@ -37,13 +39,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5',
-        padding: 20,
     },
     title: {
         fontSize: 24,
