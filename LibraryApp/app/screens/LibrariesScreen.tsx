@@ -146,6 +146,7 @@ const LibrariesScreen: React.FC = () => {
     const renderCard = ({ item }: { item: Library }) => (
         <TouchableOpacity
             style={styles.card}
+            onPress={() => router.push({ pathname: './LibraryBookScreen', params: { id: item.id } })}
             onLongPress={() => {
                 Alert.alert(
                     "Ações",
@@ -187,7 +188,7 @@ const LibrariesScreen: React.FC = () => {
                 style={styles.backButton}
                 onPress={() => navigation.goBack()}
             >
-                <Text style={styles.backButtonText}>Voltar</Text>
+                <Text style={styles.backButtonText}>Back</Text>
             </TouchableOpacity>
 
             {loading ? (
