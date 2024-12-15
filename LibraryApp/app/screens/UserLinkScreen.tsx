@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
 import { View, Text, StyleSheet, FlatList, Image, Alert, TouchableOpacity } from 'react-native';
+import {useEffect, useState} from "react";
 
 interface Book {
     title: string;
