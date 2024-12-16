@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { View, Text, StyleSheet, FlatList, Image, Alert, TouchableOpacity } from 'react-native';
-import {useEffect, useState} from "react";
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
+import { useSearchParams } from 'expo-router'; // Para acessar os parâmetros passados pela rota
 
 interface Book {
     title: string;
@@ -14,14 +14,17 @@ interface LibraryBook {
     dueDate: string;
 }
 
-const UserLinkScreen: React.FC<{ route: any }> = ({ route }) => {
-    const { username } = route.params; // Garante que o "username" é recuperado dos parâmetros
+const UserLinkScreen: React.FC = () => {
+    const { username } = useSearchParams(); // Pega o username passado como parâmetro
     const [books, setBooks] = useState<LibraryBook[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (username) {
-            fetchBooksByUser(username);
+            fetchBooksByUser(username as string); // Certifique-se de que username é uma string
+        } else {
+            Alert.alert('Error', 'No username provided!');
+            setLoading(false);
         }
     }, [username]);
 
@@ -32,7 +35,7 @@ const UserLinkScreen: React.FC<{ route: any }> = ({ route }) => {
             setBooks(data);
         } catch (error) {
             console.error(error);
-            Alert.alert('Erro', 'Não foi possível buscar os livros.');
+            Alert.alert('Error', 'Could not fetch books for the user.');
         } finally {
             setLoading(false);
         }
@@ -42,9 +45,9 @@ const UserLinkScreen: React.FC<{ route: any }> = ({ route }) => {
         const { book } = item;
         return (
             <View style={styles.bookCard}>
-                <Text style={styles.title}>Título: {book.title}</Text>
+                <Text style={styles.title}>Title: {book.title}</Text>
                 <Text style={styles.author}>
-                    Autor: {book.authors?.[0]?.name || 'Autor desconhecido'}
+                    Author: {book.authors?.[0]?.name || 'Unknown Author'}
                 </Text>
             </View>
         );
@@ -52,16 +55,20 @@ const UserLinkScreen: React.FC<{ route: any }> = ({ route }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Livros associados a {username}</Text>
+            <Text style={styles.header}>
+                Books associated with <Text style={styles.username}>{username}</Text>
+            </Text>
             {loading ? (
-                <Text style={styles.loading}>Carregando...</Text>
-            ) : (
+                <Text style={styles.loading}>Loading...</Text>
+            ) : books.length > 0 ? (
                 <FlatList
                     data={books}
-                    keyExtractor={(item, index) => `${item.book.isbn}-${index}`}
+                    keyExtractor={(item) => item.book.isbn}
                     renderItem={renderBook}
                     contentContainerStyle={styles.list}
                 />
+            ) : (
+                <Text style={styles.noBooks}>No books found for this user.</Text>
             )}
         </View>
     );
@@ -79,9 +86,19 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         textAlign: 'center',
     },
+    username: {
+        fontWeight: 'bold',
+        color: '#6200ee',
+    },
     loading: {
         marginTop: 20,
         textAlign: 'center',
+    },
+    noBooks: {
+        marginTop: 20,
+        textAlign: 'center',
+        fontSize: 16,
+        color: '#555',
     },
     list: {
         paddingVertical: 10,
