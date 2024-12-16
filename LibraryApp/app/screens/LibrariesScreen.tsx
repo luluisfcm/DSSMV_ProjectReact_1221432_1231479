@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {router} from "expo-router";
+import {Accelerometer} from "expo-sensors";
 
 // Interface para os dados da biblioteca
 interface Library {
@@ -142,6 +143,24 @@ const LibrariesScreen: React.FC = () => {
 
     useEffect(() => {
         fetchLibraries();
+
+        // Função para detectar o movimento de agitar o telefone
+        const subscription = Accelerometer.addListener(accelerometerData => {
+            const { x, y, z } = accelerometerData;
+
+            // Lógica para detectar o movimento de agitar o telefone (exemplo simples)
+            if (Math.abs(x) > 1.5 || Math.abs(y) > 1.5 || Math.abs(z) > 1.5) {
+                setModalVisible(true); // Abre o modal quando o telefone for agitado
+            }
+        });
+
+        // Começa a ouvir os dados do acelerômetro
+        Accelerometer.setUpdateInterval(100); // Intervalo de atualização do acelerômetro
+
+        // Cleanup
+        return () => {
+            subscription.remove();
+        };
     }, []);
 
     const renderCard = ({ item }: { item: Library }) => (
