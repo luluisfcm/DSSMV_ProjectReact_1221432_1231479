@@ -14,13 +14,21 @@ const UsernameScreen: React.FC = () => {
 
         // Navegar para a próxima tela e passar o username como parâmetro
         router.push({
-            pathname: '/UserLinkScreen', // Nome do arquivo da próxima tela
+            pathname: '/screens/UserLinkScreen', // Nome do arquivo da próxima tela
             params: { username }, // Passa o username como parâmetro
         });
     };
 
+    const handleBack = () => {
+        router.back(); // Voltar para a tela anterior
+    };
+
     return (
         <View style={styles.container}>
+            {/* Botão de "Back" */}
+            <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+                <Text style={styles.backButtonText}>Back</Text>
+            </TouchableOpacity>
             <Text style={styles.label}>Insert username:</Text>
             <TextInput
                 style={styles.input}
@@ -67,6 +75,19 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: '600',
+    },
+    backButton: {
+        backgroundColor: '#6200ee',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 30,
+        marginBottom: 20,
+        alignSelf: 'flex-start',
+    },
+    backButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 

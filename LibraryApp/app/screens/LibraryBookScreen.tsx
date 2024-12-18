@@ -10,33 +10,31 @@ import {
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
-import {router} from "expo-router";
+import { router } from "expo-router";
 
-// Interface for the author data
+// Interfaces
 interface Author {
     name: string;
 }
 
-// Interface for the cover data
 interface Cover {
     largeUrl: string;
     mediumUrl: string;
     smallUrl: string;
 }
 
-// Interface for the book data
 interface Book {
-    isbn: string;      // ISBN of the book (unique identifier)
-    title: string;     // Title of the book
-    authors: Author[]; // List of authors
-    cover: Cover;      // Cover URLs
-    available: number; // 0 = Not available, 1 = Available
+    isbn: string;
+    title: string;
+    authors: Author[];
+    cover: Cover;
+    available: number;
 }
 
 const LibraryBookScreen: React.FC = () => {
     const route = useRoute();
     const navigation = useNavigation();
-    const { id: libraryId } = route.params as { id: string }; // Retrieve the library ID from route params
+    const { id: libraryId } = route.params as { id: string };
 
     const [books, setBooks] = useState<Book[] | null>(null);
     const [loading, setLoading] = useState(true);
@@ -45,21 +43,17 @@ const LibraryBookScreen: React.FC = () => {
         fetchBooks();
     }, []);
 
-    // Function to fetch books from the library
     const fetchBooks = async () => {
         try {
             const response = await fetch(`http://193.136.62.24/v1/library/${libraryId}/book`);
             const json: any[] = await response.json();
-
-            // Map the API response to match the Book interface
             const booksData: Book[] = json.map(item => ({
                 isbn: item.isbn,
                 title: item.book.title,
                 authors: item.book.authors.map((author: any) => ({ name: author.name })),
                 cover: item.book.cover,
-                available: item.available, // Assuming 0 means not available, 1 means available
+                available: item.available,
             }));
-
             setBooks(booksData);
         } catch (error) {
             console.error(error);
@@ -69,10 +63,64 @@ const LibraryBookScreen: React.FC = () => {
         }
     };
 
+    const handleCheckout = async (isbn: string, username: string) => {
+        try {
+            const response = await fetch(
+                `http://193.136.62.24/v1/library/${libraryId}/book/${isbn}/checkout`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username }),
+                }
+            );
+
+            if (response.ok) {
+                Alert.alert('Success', 'Book checked out successfully!');
+                fetchBooks(); // Refresh the list
+            } else {
+                const errorText = await response.text();
+                Alert.alert('Error', `Failed to checkout the book: ${errorText}`);
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert('Error', 'Unable to checkout the book.');
+        }
+    };
+
+    const confirmCheckout = (isbn: string, title: string, available: number) => {
+        if (available <= 0) {
+            Alert.alert('Not Available', `The book "${title}" is not currently available.`);
+            return;
+        }
+
+        Alert.prompt(
+            'Checkout Book',
+            `Enter the name of the client for "${title}"`,
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Checkout',
+                    onPress: (username) => {
+                        if (username) {
+                            handleCheckout(isbn, username);
+                        } else {
+                            Alert.alert('Error', 'Client name is required.');
+                        }
+                    },
+                },
+            ],
+            'plain-text'
+        );
+    };
+
     const renderBook = ({ item }: { item: Book }) => (
         <TouchableOpacity
             style={styles.card}
-            onPress={() => router.push({ pathname: './BookDetailsScreen', params: { isbn: item.isbn }})}
+            onPress={() => router.push({ pathname: './BookDetailsScreen', params: { isbn: item.isbn } })}
+            onLongPress={() => confirmCheckout(item.isbn, item.title, item.available)}
         >
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.author}>Author: {item.authors.map(a => a.name).join(', ')}</Text>
@@ -81,7 +129,6 @@ const LibraryBookScreen: React.FC = () => {
             </Text>
         </TouchableOpacity>
     );
-
 
     return (
         <View style={styles.container}>
@@ -97,7 +144,7 @@ const LibraryBookScreen: React.FC = () => {
             ) : books && books.length > 0 ? (
                 <FlatList
                     data={books}
-                    keyExtractor={(item) => item.isbn} // Use ISBN as the unique key
+                    keyExtractor={(item) => item.isbn}
                     renderItem={renderBook}
                     contentContainerStyle={styles.list}
                 />

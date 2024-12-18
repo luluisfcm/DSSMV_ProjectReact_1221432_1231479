@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
-import { useSearchParams } from 'expo-router'; // Para acessar os parâmetros passados pela rota
+import { View, Text, StyleSheet, FlatList, Alert, TouchableOpacity } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
 interface Book {
     title: string;
@@ -15,9 +15,10 @@ interface LibraryBook {
 }
 
 const UserLinkScreen: React.FC = () => {
-    const { username } = useSearchParams(); // Pega o username passado como parâmetro
+    const { username } = useLocalSearchParams(); // Pega o username passado como parâmetro
     const [books, setBooks] = useState<LibraryBook[]>([]);
     const [loading, setLoading] = useState(true);
+    const router = useRouter(); // Para lidar com navegação
 
     useEffect(() => {
         if (username) {
@@ -41,31 +42,31 @@ const UserLinkScreen: React.FC = () => {
         }
     };
 
-    const renderBook = ({ item }: { item: LibraryBook }) => {
-        const { book } = item;
-        return (
-            <View style={styles.bookCard}>
-                <Text style={styles.title}>Title: {book.title}</Text>
-                <Text style={styles.author}>
-                    Author: {book.authors?.[0]?.name || 'Unknown Author'}
-                </Text>
-            </View>
-        );
-    };
-
     return (
         <View style={styles.container}>
+            {/* Botão de Voltar */}
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <Text style={styles.backButtonText}>← Back</Text>
+            </TouchableOpacity>
+
             <Text style={styles.header}>
                 Books associated with <Text style={styles.username}>{username}</Text>
             </Text>
+
             {loading ? (
                 <Text style={styles.loading}>Loading...</Text>
             ) : books.length > 0 ? (
                 <FlatList
                     data={books}
                     keyExtractor={(item) => item.book.isbn}
-                    renderItem={renderBook}
-                    contentContainerStyle={styles.list}
+                    renderItem={({ item }) => (
+                        <View style={styles.bookCard}>
+                            <Text style={styles.title}>Title: {item.book.title}</Text>
+                            <Text style={styles.author}>
+                                Author: {item.book.authors?.[0]?.name || 'Unknown Author'}
+                            </Text>
+                        </View>
+                    )}
                 />
             ) : (
                 <Text style={styles.noBooks}>No books found for this user.</Text>
@@ -79,6 +80,19 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f5f5f5',
         padding: 20,
+    },
+    backButton: {
+        backgroundColor: '#6200ee',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 30,
+        marginBottom: 20,
+        alignSelf: 'flex-start',
+    },
+    backButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     header: {
         fontSize: 18,
@@ -99,9 +113,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 16,
         color: '#555',
-    },
-    list: {
-        paddingVertical: 10,
     },
     bookCard: {
         backgroundColor: '#fff',
