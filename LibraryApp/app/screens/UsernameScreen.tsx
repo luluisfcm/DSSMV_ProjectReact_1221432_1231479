@@ -1,12 +1,10 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { router } from 'expo-router';
-import {useState} from "react"; // Importando o hook de navegação
+import { useRouter } from 'expo-router'; // Hook para navegação com rotas
 
 const UsernameScreen: React.FC = () => {
     const [username, setUsername] = useState('');
-    const navigation = useNavigation(); // Usando o hook para navegação
+    const router = useRouter(); // Inicializa o router
 
     const handleViewUsers = () => {
         if (!username.trim()) {
@@ -14,23 +12,23 @@ const UsernameScreen: React.FC = () => {
             return;
         }
 
-        // Navegar para a próxima tela passando o nome de usuário
+        // Navegar para a próxima tela e passar o username como parâmetro
         router.push({
-            pathname: './UserLinkScreen',
-            params: { username }, // Envia o nome de usuário como parâmetro
+            pathname: '/screens/UserLinkScreen', // Nome do arquivo da próxima tela
+            params: { username }, // Passa o username como parâmetro
         });
+    };
+
+    const handleBack = () => {
+        router.back(); // Voltar para a tela anterior
     };
 
     return (
         <View style={styles.container}>
-            {/* Botão de voltar */}
-            <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => navigation.goBack()} // Vai para a tela anterior
-            >
+            {/* Botão de "Back" */}
+            <TouchableOpacity style={styles.backButton} onPress={handleBack}>
                 <Text style={styles.backButtonText}>Back</Text>
             </TouchableOpacity>
-
             <Text style={styles.label}>Insert username:</Text>
             <TextInput
                 style={styles.input}
@@ -50,19 +48,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f5f5f5',
         padding: 20,
-    },
-    backButton: {
-        backgroundColor: '#6200ee',
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 30,
-        marginBottom: 20,
-        alignSelf: 'flex-start',
-    },
-    backButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
     },
     label: {
         fontSize: 18,
@@ -84,11 +69,25 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
         paddingHorizontal: 30,
         borderRadius: 25,
+        alignItems: 'center',
     },
     buttonText: {
         color: '#fff',
         fontSize: 16,
         fontWeight: '600',
+    },
+    backButton: {
+        backgroundColor: '#6200ee',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 30,
+        marginBottom: 20,
+        alignSelf: 'flex-start',
+    },
+    backButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 
